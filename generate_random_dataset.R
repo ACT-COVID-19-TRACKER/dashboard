@@ -66,7 +66,7 @@ for (p in seq(n))
 
   # Next refinement - for a single patient probably don't want so much
   # variation observation to observation.
-  
+
   r_data_frame(n=nobs,
                swabbed=answer,
                result=r_sample_factor(x=c("pending", "positive", "negative", "na")),
@@ -97,6 +97,17 @@ for (p in seq(n))
   observations %<>% bind_rows(cbind(ptbl, otbl))
 
 }
+
+# Exploring option to remove flip/flop of specific variables - might
+# still want some variation within a patient though. 
+
+## r_data_frame(n=n,
+##              swabbed=answer,
+##              result=r_sample_factor(x=c("pending", "positive", "negative", "na"))) %>%
+##   mutate(result=factor(ifelse(swabbed == "Yes", result, "na"), labels=c("pending", "positive", "negative", "na", "na"))) ->
+## potbl
+
+## cbind(potbl[rep(1:n, obs*days),], observations)
 
 write_csv(format(observations), "random_timeseries.csv")
 
