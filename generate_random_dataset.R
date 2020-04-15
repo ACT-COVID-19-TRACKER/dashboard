@@ -66,27 +66,27 @@ for (p in seq(n))
   
   r_data_frame(n=nobs,
                swabbed=answer,
-               result=r_sample_factor(x=c("penging", "positive", "negative", "na")),
+               result=r_sample_factor(x=c("pending", "positive", "negative", "na")),
                previous=answer(prob=c(0.8,0.2)),
                clinical=answer,
-               hr=r_sample(40:150),
-               bps=r_sample(80:250),
-               bpd=r_sample(40:180),
-               sao2=r_sample(85:100),
-               rr=r_sample(5:35),
-               temp=normal(37, 1.2),
-               gcs=r_sample(0:30),
-               wcc=normal(7,3),
-               neutrophil=normal(4, 2),
-               lymphocyte=normal(2.5, 2),
-               ddimer =normal(3, 1),
-               crp=normal(7, 4),
-               ferritin=r_sample(7:270),
-               troponin=normal(0.3, 0.1),
-               pao2=r_sample(70:100),
-               paco2=r_sample(35:45),
-               ph=normal(7.4, 0.1),
-               hco3=r_sample(19:25)) ->
+               hr=r_sample(60:299, prob=c(rep(0.02, 40), rep(0.001, 200))), # 60-100 0-300+
+               bps=r_sample(90:135), # 90-135 0-200+
+               bpd=r_sample(60:130), # 60-90 0-130+
+               sao2=r_sample(85:100), # 95-100 0-100
+               rr=r_sample(5:35), # 12-20 0-40+
+               temp=normal(36.3, 1.2), # 35.7-37.5 34-46+
+               gcs=r_sample(3:15, prob=c(rep(0.01, 12), 0.88)), # 15 3-15
+               wcc=normal(7,3, min=0), # 3.5-10 0-20+
+               neutrophil=normal(4, 2, min=0), # 1.5-6.5 0-10+
+               lymphocyte=normal(2.5, 2, min=0), # 1.0-4.0 0-10+
+               ddimer =normal(0.3, 0.25, min=0), # 0-0.5 0-5
+               crp=normal(2.5, 2, min=0, max=200), # 0-5 0-200+
+               ferritin=r_sample(7:270), # 0-200+
+               troponin=normal(0.02, 0.01, min=0, max=10), # 0-0.03 0-10
+               pao2=r_sample(70:105), # 70-100 0-100+  FIXME
+               paco2=r_sample(25:45),
+               ph=normal(7.4, 0.1, min=7.2, max=7.6), # 7.35-7.45 7.2-7.6
+               hco3=r_sample(12:30)) -> # 21-28 10-40
   otbl
 
   # Add to table of observations across all patients.
@@ -95,5 +95,5 @@ for (p in seq(n))
 
 }
 
-write_csv(format(observations, digits=2), "random_timeseries.csv")
+write_csv(format(observations), "random_timeseries.csv")
 
