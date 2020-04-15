@@ -63,6 +63,9 @@ for (p in seq(n))
   ptbl
 
   # Observations for this patient.
+
+  # Next refinement - for a single patient probably don't want so much
+  # variation observation to observation.
   
   r_data_frame(n=nobs,
                swabbed=answer,
