@@ -18,6 +18,8 @@ dspath <- dsname %s+% ".csv"
 random_timeseries <- read_csv(dspath)
 ds <- get(dsname)
 
+# PERSONA Is this CLINCIAL RESPONSE?
+
 # We will consider positive patients only.
 
 # Daily count.
@@ -31,7 +33,8 @@ ds %>%
   geom_line()
 dev.off()
 
-# Time series aggreations.
+# Time series aggregations. Could use colour bands for normal, and
+# abnormal ranges as per the sample patient sheet from Nikhil.
 
 pdf("daily_obs.pdf", height=12, width=25)
 ds %>%
