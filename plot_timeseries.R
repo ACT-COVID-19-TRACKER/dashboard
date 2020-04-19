@@ -18,7 +18,8 @@ dspath <- dsname %s+% ".csv"
 random_timeseries <- read_csv(dspath)
 ds <- get(dsname)
 
-# PERSONA Is this CLINCIAL RESPONSE?
+# Need to focus visualisations on personas. This PERSONA might be
+# CLINCIAL OVERVIEW?
 
 # We will consider positive patients only.
 
