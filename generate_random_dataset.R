@@ -3,14 +3,15 @@
 # Author: Graham Williams
 # Date: 20200415
 
-library(wakefield)
-library(readr)
-library(stringi)
-library(magrittr)
-library(lubridate)
+library(wakefield)    # Generate random datasets.
+library(readr)        # Modern and efficient data reader/writer.
+library(stringi)      # String concat operator: %s+%.
+library(magrittr)     # Data pipelines: %>% %<>% %T>% equals().
+library(lubridate)    # Dates and time.
+library(dplyr)
 
-n <- 100 # Number of patients.
-obs <- 2 # Number of observations per day.
+n <- 50 # Number of patients.
+obs <- 1 # Number of observations per day.
 
 # Fixed patient data - COMPLETE.
 
@@ -28,7 +29,8 @@ r_data_frame(n=n,
              hypertension=answer,
              bmigt30=answer,
              ihd=answer,
-             copd=answer) %>%
+             copd=answer,
+             hosp=r_sample_factor(x=c("H1", "H2", "H3"))) %>%
   mutate(URN="u" %s+% URN) %T>%
   write_csv("random_fixed.csv") ->
 patients
@@ -89,7 +91,31 @@ for (p in seq(n))
                pao2=r_sample(70:105), # 70-100 0-100+  FIXME
                paco2=r_sample(25:45),
                ph=normal(7.4, 0.1, min=7.2, max=7.6), # 7.35-7.45 7.2-7.6
-               hco3=r_sample(12:30)) -> # 21-28 10-40
+               hco3=r_sample(12:30)) %>%  # 21-28 10-40
+    mutate(MEWSrr=case_when(rr <= 4 | rr >= 36 ~ 4,
+                           rr %in% c(5:8, 31:35) ~ 3,
+                           rr %in% 25:30 ~ 2,
+                           rr %in% 21:24 ~ 1,
+                           rr %in% 9:20 ~ 0),
+           MEWSsao2=case_when(sao2 <= 84 ~ 4,
+                              sao2 %in% 85:89 ~ 3,
+                              sao2 %in% 90:92 ~ 2,
+                              sao2 %in% 93:94 ~ 1,
+                              sao2 >= 95 ~ 0),
+           MEWStemp=case_when(temp <= 34 ~ 3,
+                              temp >= 34.1 & temp <= 35.0 ~ 2,
+                              temp >= 35.1 & temp <= 36.0 ~ 1,
+                              temp >= 36.1 & temp <= 37.9 ~ 0,
+                              temp >= 38.0 & temp <= 38.5 ~ 1,
+                              temp >= 38.6 ~ 2),
+           MEWShr=case_when(hr <= 39 ~ 4,
+                            hr %in% 40:49 ~ 1,
+                            hr %in% 50:99 ~ 0,
+                            hr %in% 100:109 ~ 1,
+                            hr %in% 110:129 ~ 2,
+                            hr %in% 130:139 ~ 3,
+                            hr > 140 ~ 4),
+           MEWS=MEWSrr+MEWSsao2+MEWShr+MEWStemp) ->
   otbl
 
   # Add to table of observations across all patients.
