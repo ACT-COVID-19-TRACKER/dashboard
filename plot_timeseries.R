@@ -9,7 +9,6 @@ ALLPLOTS=FALSE
 ALLPLOTS=TRUE
 
 library(readr)
-library(stringi)
 library(magrittr)
 library(dplyr)
 library(ggplot2)
@@ -39,7 +38,7 @@ ds %>%
   ggplot(aes(x=date, y=count)) +
   geom_line()
 dev.off()
-system("evince " %s+% fname, wait=FALSE)
+system(glue("evince {fname}"), wait=FALSE)
 }
 
 # Time series aggregations. Could use colour bands for normal, and
@@ -50,8 +49,7 @@ if (ALLPLOTS)
 fname <- "daily_obs.pdf"
 pdf(fname, height=12, width=25)
 ds %>%
-  select(-URN, -time, -swabbed, -result, -previous, -clinical,
-         -MEWSrr, -MEWSsao2, -MEWStemp, -MEWShr, MEWSsedation) %>%
+  select(-URN, -time, -swabbed, -result, -previous, -clinical, -sedation) %>%
   pivot_longer(-date, names_to="test") %>%
   ggplot(aes(x=date, y=value)) +
   geom_point(shape=".") +
@@ -59,7 +57,7 @@ ds %>%
   facet_wrap(~test, scales="free") +
   labs(x=NULL, y=NULL)
 dev.off()
-system(glue("evince {daily_obs.pdf}")
+system(glue("evince {fname}"), wait=FALSE)
 }
 
 # Focus on MEWS
@@ -71,12 +69,13 @@ pdf(fname, width=15) #height=12, width=25)
 ds %>%
   filter(date >= "2020-04-10") %>%
   select(date, MEWS) %>%
+  mutate(MEWS=ifelse(MEWS>8,8,MEWS)) %>%
   mutate(MEWS=as.factor(MEWS)) %>%
   pivot_longer(-date, names_to="test") %>%
   drop_na() %>%
   ggplot(aes(x=date, y=value, colour=value)) +
 #  geom_quasirandom(method="smiley") + 
-  geom_quasirandom(method="tukey") + 
+  geom_quasirandom(method="tukey", groupOnX=FALSE) + 
 #  geom_beeswarm() +
 #  geom_quasirandom() +
 #  geom_jitter() +
@@ -86,7 +85,7 @@ ds %>%
   theme(legend.position="none") +
   labs(x=NULL, y=NULL)
 dev.off()
-system("evince daily_mews.pdf")
+system(glue("evince {fname}"), wait=FALSE)
 }
 
 # MEWS and Beds - UNDER DEVELOPMENT
