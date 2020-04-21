@@ -17,7 +17,7 @@ library(ggbeeswarm)
 library(glue)
 
 dsname <- "random_timeseries"
-dspath <- dsname %s+% ".csv"
+dspath <- glue("{dsname}.csv")
 random_timeseries <- read_csv(dspath)
 ds <- get(dsname)
 
@@ -38,7 +38,7 @@ ds %>%
   ggplot(aes(x=date, y=count)) +
   geom_line()
 dev.off()
-system(glue("evince {fname}"), wait=FALSE)
+system(glue("evince {fname}"))
 }
 
 # Time series aggregations. Could use colour bands for normal, and
@@ -57,7 +57,7 @@ ds %>%
   facet_wrap(~test, scales="free") +
   labs(x=NULL, y=NULL)
 dev.off()
-system(glue("evince {fname}"), wait=FALSE)
+system(glue("evince {fname}"))
 }
 
 # Focus on MEWS
@@ -85,7 +85,7 @@ ds %>%
   theme(legend.position="none") +
   labs(x=NULL, y=NULL)
 dev.off()
-system(glue("evince {fname}"), wait=FALSE)
+system(glue("evince {fname}"))
 }
 
 # MEWS and Beds - UNDER DEVELOPMENT
