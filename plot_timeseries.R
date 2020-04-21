@@ -6,6 +6,7 @@
 # Date: 20200419
 
 ALLPLOTS=FALSE
+ALLPLOTS=TRUE
 
 library(readr)
 library(stringi)
@@ -14,6 +15,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(ggbeeswarm)
+library(glue)
 
 dsname <- "random_timeseries"
 dspath <- dsname %s+% ".csv"
@@ -29,14 +31,15 @@ ds <- get(dsname)
 
 if (ALLPLOTS)
 {
-pdf("daily_count.pdf", height=4, width=15)
+fname <- "daily_count.pdf"
+pdf(fname, height=4, width=15)
 ds %>%
-  filter(result == "positive") %>%
   group_by(date) %>%
   summarise(count=n()) %>%
   ggplot(aes(x=date, y=count)) +
   geom_line()
 dev.off()
+system("evince " %s+% fname, wait=FALSE)
 }
 
 # Time series aggregations. Could use colour bands for normal, and
@@ -44,11 +47,11 @@ dev.off()
 
 if (ALLPLOTS)
 {
-pdf("daily_obs.pdf", height=12, width=25)
+fname <- "daily_obs.pdf"
+pdf(fname, height=12, width=25)
 ds %>%
-  filter(result == "positive") %>%
   select(-URN, -time, -swabbed, -result, -previous, -clinical,
-         -MEWSrr, -MEWSsao2, -MEWStemp, -MEWShr) %>%
+         -MEWSrr, -MEWSsao2, -MEWStemp, -MEWShr, MEWSsedation) %>%
   pivot_longer(-date, names_to="test") %>%
   ggplot(aes(x=date, y=value)) +
   geom_point(shape=".") +
@@ -56,11 +59,13 @@ ds %>%
   facet_wrap(~test, scales="free") +
   labs(x=NULL, y=NULL)
 dev.off()
-# system("evince daily_obs.pdf")
+system(glue("evince {daily_obs.pdf}")
 }
 
 # Focus on MEWS
 
+if (ALLPLOTS)
+{
 fname <- "daily_mews.pdf"
 pdf(fname, width=15) #height=12, width=25)
 ds %>%
@@ -82,3 +87,26 @@ ds %>%
   labs(x=NULL, y=NULL)
 dev.off()
 system("evince daily_mews.pdf")
+}
+
+# MEWS and Beds - UNDER DEVELOPMENT
+
+if (FALSE)
+{
+fname <- "daily_beds.pdf"
+pdf(fname, width=15) #height=12, width=25)
+ds %>%
+  filter(date >= "2020-04-10") %>%
+  select(date, MEWS) %>%
+  drop_na() %>%
+  group_by(date, MEWS) %>%
+  summarise(n=n()) %>%
+  mutate(MEWS=as.factor(MEWS)) %>%
+  ggplot(aes(x=date, y=n, colour=MEWS)) +
+  geom_bar() +
+  theme(legend.position="none") +
+  labs(x=NULL, y=NULL)
+dev.off()
+system("evince daily_mews.pdf")
+}
+
