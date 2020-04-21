@@ -5,12 +5,12 @@
 
 library(wakefield)    # Generate random datasets.
 library(readr)        # Modern and efficient data reader/writer.
-library(stringi)      # String concat operator: %s+%.
 library(magrittr)     # Data pipelines: %>% %<>% %T>% equals().
 library(lubridate)    # Dates and time.
 library(dplyr)
+library(glue)
 
-n <- 50 # Number of patients.
+n <- 100 # Number of patients.
 obs <- 1 # Number of observations per day.
 
 # Fixed patient data - COMPLETE.
@@ -31,7 +31,7 @@ r_data_frame(n=n,
              ihd=answer,
              copd=answer,
              hosp=r_sample_factor(x=c("H1", "H2", "H3"))) %>%
-  mutate(URN="u" %s+% URN) %T>%
+  mutate(URN=glue("u{URN}")) %T>%
   write_csv("random_fixed.csv") ->
 patients
 
@@ -74,6 +74,7 @@ for (p in seq(n))
                result=r_sample_factor(x=c("pending", "positive", "negative", "na")),
                previous=answer(prob=c(0.8,0.2)),
                clinical=answer,
+               sedation=r_sample_factor(x=c("awake", "mild", "moderate", "severe"), prob=c(0.7, 0.2, 0.09, 0.01)),
                hr=r_sample(60:299, prob=c(rep(0.02, 40), rep(0.001, 200))), # 60-100 0-300+
                bps=r_sample(90:135), # 90-135 0-200+
                bpd=r_sample(60:130), # 60-90 0-130+
@@ -115,7 +116,11 @@ for (p in seq(n))
                             hr %in% 110:129 ~ 2,
                             hr %in% 130:139 ~ 3,
                             hr > 140 ~ 4),
-           MEWS=MEWSrr+MEWSsao2+MEWShr+MEWStemp) ->
+           MEWSsedation= case_when(sedation == "awake" ~ 0,
+                                   sedation == "mild" ~ 2,
+                                   sedation == "moderate" ~ 3,
+                                   sedation == "severe" ~ 4),
+           MEWS=MEWSrr+MEWSsao2+MEWShr+MEWStemp+MEWSsedation) ->
   otbl
 
   # Add to table of observations across all patients.
