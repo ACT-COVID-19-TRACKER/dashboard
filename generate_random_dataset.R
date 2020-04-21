@@ -10,7 +10,7 @@ library(lubridate)    # Dates and time.
 library(dplyr)
 library(glue)
 
-n <- 100 # Number of patients.
+n <- 80 # Number of patients.
 obs <- 1 # Number of observations per day.
 
 # Fixed patient data - COMPLETE.
