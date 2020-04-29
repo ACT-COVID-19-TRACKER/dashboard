@@ -103,12 +103,12 @@ for (p in seq(n))
                               sao2 %in% 90:92 ~ 2,
                               sao2 %in% 93:94 ~ 1,
                               sao2 >= 95 ~ 0),
-           MEWStemp=case_when(temp <= 34 ~ 3,
-                              temp >= 34.1 & temp <= 35.0 ~ 2,
-                              temp >= 35.1 & temp <= 36.0 ~ 1,
-                              temp >= 36.1 & temp <= 37.9 ~ 0,
-                              temp >= 38.0 & temp <= 38.5 ~ 1,
-                              temp >= 38.6 ~ 2),
+           MEWStemp=case_when(temp <= 34.0 ~ 3,
+                              temp >  34.0 & temp <= 35.0 ~ 2,
+                              temp >  35.0 & temp <= 36.0 ~ 1,
+                              temp >  36.0 & temp <= 37.9 ~ 0,
+                              temp >  37.9 & temp <= 38.5 ~ 1,
+                              temp >  38.5 ~ 2),
            MEWShr=case_when(hr <= 39 ~ 4,
                             hr %in% 40:49 ~ 1,
                             hr %in% 50:99 ~ 0,
@@ -120,6 +120,7 @@ for (p in seq(n))
                                    sedation == "mild" ~ 2,
                                    sedation == "moderate" ~ 3,
                                    sedation == "severe" ~ 4),
+           # NOTE - not yet capturing the blood pressure MEWS
            MEWS=MEWSrr+MEWSsao2+MEWShr+MEWStemp+MEWSsedation) ->
   otbl
 
