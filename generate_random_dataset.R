@@ -115,7 +115,7 @@ for (p in seq(n))
                             hr %in% 100:109 ~ 1,
                             hr %in% 110:129 ~ 2,
                             hr %in% 130:139 ~ 3,
-                            hr > 140 ~ 4),
+                            hr >= 140 ~ 4),
            MEWSsedation= case_when(sedation == "awake" ~ 0,
                                    sedation == "mild" ~ 2,
                                    sedation == "moderate" ~ 3,
